@@ -6,7 +6,7 @@
 /*   By: vhaefeli <vhaefeli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/29 15:15:45 by vhaefeli          #+#    #+#             */
-/*   Updated: 2022/08/30 00:49:10 by vhaefeli         ###   ########.fr       */
+/*   Updated: 2022/08/30 12:32:01 by vhaefeli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ typedef struct s_sq_data
 	int		y_min;
 	int		y_max;
 	char	c;
+	FILE	*op_file;
 } t_sq_data;
 
 #endif
