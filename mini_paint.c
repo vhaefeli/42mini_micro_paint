@@ -1,31 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   micro_paint.c                                      :+:      :+:    :+:   */
+/*   mini_paint.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vhaefeli <vhaefeli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/29 15:14:56 by vhaefeli          #+#    #+#             */
-/*   Updated: 2022/08/31 08:10:50 by vhaefeli         ###   ########.fr       */
+/*   Updated: 2022/08/31 09:22:12 by vhaefeli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "micro_paint.h"
 
-int	float_to_int_min(float min_float_nb)
+float	dist_to_center(int i, int j, float fx, float fy)
 {
-	int i;
-
-	i = (int)min_float_nb;
-	if (min_float_nb - i > 0)
-		return ((int)min_float_nb + 1);
-	else
-		return (i);
-}
-
-int	float_to_int_max(float max_float_nb)
-{
-	return ((int)max_float_nb);
+	return (srqt((i - fx) * (i - fx) + (j - fy) * (j - fy)));
 }
 
 int	print_paint(char *drawing_table, int width, int height)
@@ -68,8 +57,8 @@ int main(int argc, char **argv)
 	int			k;
 	float		fx;
 	float		fy;
-	float		fw;
-	float		fh;
+	float		fradius;
+	float		d;
 
 	if (argc != 2)
 	{
@@ -87,26 +76,33 @@ int main(int argc, char **argv)
 	while (k != EOF && k > -1)
 	{
 		j = 0;
-		k = fscanf(sq_data.op_file,"%c %f %f %f %f %c\n", &sq_data.sq_type, &fx, &fy, &fw, &fh, &sq_data.c);
+		k = fscanf(sq_data.op_file,"%c %f %f %f %c\n", &sq_data.sq_type, &fx, &fy, &fradius, &sq_data.c);
 		if (k == -1)
 			break ;
-		if (fw < 0 || fh < 0 || k != 6)
+		if (fradius < 0 || k != 5)
 			return (op_error());
 		sq_data.x_min = float_to_int_min(fx);
 		sq_data.y_min = float_to_int_min(fy);
 		sq_data.x_max = float_to_int_max(fx + fw);
 		sq_data.y_max = float_to_int_max(fy + fh);
-		if (sq_data.sq_type == 'r')
+		if (sq_data.sq_type == 'c')
 		{
 			while (j < height)
 			{
 				while (i < width)
 				{
-					if ((i == sq_data.x_min || i == sq_data.x_max) && j >= sq_data.y_min && j <= sq_data.y_max)
+					d = dist_to_center(i, j, fx, fy);
+					if (d <= fradius)
 					{
-						drawing_table[j * width + i] = sq_data.c;
+						if (i < fx)
+						{
+							if (j < fy)
+							{
+								if (dist_to_center( i - 1, j, fx, fy) > fradius || dist_to_center( i, j - 1, fx, fy) > fradius)
+									drawing_table[j * width + i] = sq_data.c;
+							}
+						}
 					}
-					if (i >sq_data.x_min && i <sq_data.x_max && (j == sq_data.y_min || j == sq_data.y_max))
 						drawing_table[j * width + i] = sq_data.c;
 					i++;
 				}
@@ -114,13 +110,14 @@ int main(int argc, char **argv)
 				i = 0;
 			}
 		}
-		else if (sq_data.sq_type == 'R')
+		else if (sq_data.sq_type == 'C')
 		{
 			while (j < height)
 			{
 				while (i < width)
 				{
-					if ((i >= sq_data.x_min && i <= sq_data.x_max) && j >= sq_data.y_min && j <= sq_data.y_max)
+					d = dist_to_center(i, j, fx, fy);
+					if (d <= fradius)
 						drawing_table[j * width + i] = sq_data.c;
 					i++;
 				}
