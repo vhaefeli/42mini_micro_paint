@@ -6,15 +6,18 @@
 /*   By: vhaefeli <vhaefeli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/29 15:14:56 by vhaefeli          #+#    #+#             */
-/*   Updated: 2022/08/31 09:22:12 by vhaefeli         ###   ########.fr       */
+/*   Updated: 2022/08/31 14:43:58 by vhaefeli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "micro_paint.h"
+#include "mini_paint.h"
 
 float	dist_to_center(int i, int j, float fx, float fy)
 {
-	return (srqt((i - fx) * (i - fx) + (j - fy) * (j - fy)));
+	float	d;
+
+	d = (float)sqrt((i - fx) * (i - fx) + (j - fy) * (j - fy));
+	return (d);
 }
 
 int	print_paint(char *drawing_table, int width, int height)
@@ -79,12 +82,8 @@ int main(int argc, char **argv)
 		k = fscanf(sq_data.op_file,"%c %f %f %f %c\n", &sq_data.sq_type, &fx, &fy, &fradius, &sq_data.c);
 		if (k == -1)
 			break ;
-		if (fradius < 0 || k != 5)
+		if (fradius <= 0 || k != 5)
 			return (op_error());
-		sq_data.x_min = float_to_int_min(fx);
-		sq_data.y_min = float_to_int_min(fy);
-		sq_data.x_max = float_to_int_max(fx + fw);
-		sq_data.y_max = float_to_int_max(fy + fh);
 		if (sq_data.sq_type == 'c')
 		{
 			while (j < height)
@@ -94,16 +93,9 @@ int main(int argc, char **argv)
 					d = dist_to_center(i, j, fx, fy);
 					if (d <= fradius)
 					{
-						if (i < fx)
-						{
-							if (j < fy)
-							{
-								if (dist_to_center( i - 1, j, fx, fy) > fradius || dist_to_center( i, j - 1, fx, fy) > fradius)
-									drawing_table[j * width + i] = sq_data.c;
-							}
-						}
+						if (dist_to_center( i - 1, j, fx, fy) > fradius || dist_to_center( i, j - 1, fx, fy) > fradius || dist_to_center(i + 1, j, fx, fy) > fradius || dist_to_center( i, j + 1, fx, fy) > fradius)
+							drawing_table[j * width + i] = sq_data.c;
 					}
-						drawing_table[j * width + i] = sq_data.c;
 					i++;
 				}
 				j++;

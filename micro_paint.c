@@ -6,7 +6,7 @@
 /*   By: vhaefeli <vhaefeli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/29 15:14:56 by vhaefeli          #+#    #+#             */
-/*   Updated: 2022/08/31 08:10:50 by vhaefeli         ###   ########.fr       */
+/*   Updated: 2022/08/31 13:50:14 by vhaefeli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ int	float_to_int_min(float min_float_nb)
 
 int	float_to_int_max(float max_float_nb)
 {
+	if (max_float_nb < 0)
+		return ((int)max_float_nb - 1);
 	return ((int)max_float_nb);
 }
 
@@ -80,7 +82,7 @@ int main(int argc, char **argv)
 	if (!sq_data.op_file)
 		return (op_error());
 	k = fscanf(sq_data.op_file,"%d %d %c\n", &width, &height, &background);
-	if (width <= 0 || width > 300 || height <= 0 || height > 300)
+	if (k != 3 || width <= 0 || width > 300 || height <= 0 || height > 300)
 		return (op_error());
 	drawing_table = malloc(width * height * sizeof(char) + 1);
 	memset(drawing_table, background, width * height);
@@ -90,42 +92,49 @@ int main(int argc, char **argv)
 		k = fscanf(sq_data.op_file,"%c %f %f %f %f %c\n", &sq_data.sq_type, &fx, &fy, &fw, &fh, &sq_data.c);
 		if (k == -1)
 			break ;
-		if (fw < 0 || fh < 0 || k != 6)
+		if (fw <= 0 || fh <= 0 || k != 6)
 			return (op_error());
 		sq_data.x_min = float_to_int_min(fx);
 		sq_data.y_min = float_to_int_min(fy);
 		sq_data.x_max = float_to_int_max(fx + fw);
 		sq_data.y_max = float_to_int_max(fy + fh);
+		// printf(" sq_data.x_min %d sq_data.y_min %d sq_data.x_max %d sq_data.y_max %d \n", sq_data.x_min, sq_data.y_min, sq_data.x_max, sq_data.y_max);
 		if (sq_data.sq_type == 'r')
 		{
-			while (j < height)
+			if (sq_data.x_max - (int)fx > 0 && sq_data.y_max - (int)fy > 0)
 			{
-				while (i < width)
+				while (j < height)
 				{
-					if ((i == sq_data.x_min || i == sq_data.x_max) && j >= sq_data.y_min && j <= sq_data.y_max)
+					while (i < width)
 					{
-						drawing_table[j * width + i] = sq_data.c;
+						if ((i == sq_data.x_min || i == sq_data.x_max) && j >= sq_data.y_min && j <= sq_data.y_max)
+						{
+							drawing_table[j * width + i] = sq_data.c;
+						}
+						if (i >sq_data.x_min && i <sq_data.x_max && (j == sq_data.y_min || j == sq_data.y_max))
+							drawing_table[j * width + i] = sq_data.c;
+						i++;
 					}
-					if (i >sq_data.x_min && i <sq_data.x_max && (j == sq_data.y_min || j == sq_data.y_max))
-						drawing_table[j * width + i] = sq_data.c;
-					i++;
+					j++;
+					i = 0;
 				}
-				j++;
-				i = 0;
 			}
 		}
 		else if (sq_data.sq_type == 'R')
 		{
-			while (j < height)
+			if (sq_data.x_max - (int)fx > 0 && sq_data.y_max - (int)fy > 0)
 			{
-				while (i < width)
+				while (j < height)
 				{
-					if ((i >= sq_data.x_min && i <= sq_data.x_max) && j >= sq_data.y_min && j <= sq_data.y_max)
-						drawing_table[j * width + i] = sq_data.c;
-					i++;
+					while (i < width)
+					{
+						if ((i >= sq_data.x_min && i <= sq_data.x_max) && j >= sq_data.y_min && j <= sq_data.y_max)
+							drawing_table[j * width + i] = sq_data.c;
+						i++;
+					}
+					j++;
+					i = 0;
 				}
-				j++;
-				i = 0;
 			}
 		}
 		else
